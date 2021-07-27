@@ -3,63 +3,69 @@ import Input from './components/Input';
 import TodoList from './components/TodoList';
 import Pending from './components/Pending';
 import './App.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { todoRecovered } from './redux/actionCreator';
 
 function App() {
 
   const [newTodoItem, setNewTodoItem] = useState('');
-  const [todoList, setTodoList] = useState([]);
+  const [filterTodo, setFilterTodo] = useState([]);
   const [status, setStatus] = useState('all');
-  const [filteredTodos, setFilteredTodos] = useState([]);
+  const dispatch = useDispatch();
+  const todos = useSelector(state => state.todos);
   const [count, setCount] = useState(0);
 
   //run once when app mounts on DOM
   useEffect(() => {
     getLocalTodos();
-  }, []);
+  }, [])
 
   useEffect(() => {
 
     doFilterTodo();
     setCount(
-      todoList.filter(todo => todo.isCompleted !== true).length
-    );
-    saveToLocal();
+      todos.filter(todo => todo.isCompleted !== true).length
+    )
+    saveToLocal()
 
-  }, [status, todoList]);
+  }, [todos]);
 
-  const doFilterTodo = () => {
+  const doFilterTodo = (value = status) => {
+    
+    setStatus(value);
 
-    switch(status) {
+    switch(value) {
 
       case 'completed':
-        setFilteredTodos(
-          todoList.filter((todo) => todo.isCompleted === true )
+        setFilterTodo(
+          todos.filter(todo => todo.isCompleted === true)
         );
+        console.log(filterTodo);
         break;
 
       case 'uncompleted':
-        setFilteredTodos(
-          todoList.filter((todo) => todo.isCompleted !== true)
+        setFilterTodo(
+          todos.filter((todo) => todo.isCompleted !== true)
         );
         break;
       
       default:
-        setFilteredTodos(todoList);
+        setFilterTodo(todos);
     }
   }
 
   //save to local
   const saveToLocal = () => {
-    localStorage.setItem('todos', JSON.stringify(todoList));
+    localStorage.setItem('todos', JSON.stringify(todos));
   };
 
   const getLocalTodos = () => {
-
     if(localStorage.getItem('todos') === null) {
       localStorage.setItem('todos', JSON.stringify([]));
     } else {
       let local = JSON.parse(localStorage.getItem('todos'));
-      setTodoList(local);
+      console.log(local);
+      dispatch(todoRecovered(local));
     }
   };
 
@@ -68,19 +74,19 @@ function App() {
 
       <h1>Rohit's Todo List</h1>
 
-      <Input input={newTodoItem} setInput={setNewTodoItem} todo={todoList} setTodo={setTodoList} />
+      <Input input={newTodoItem} setInput={setNewTodoItem} />
 
       <div className="select">
-        <select name="typeTodo" onChange={(e) => setStatus(e.target.value)}>
+        <select name="typeTodo" onChange={(e) => doFilterTodo(e.target.value)}>
           <option value="all">All</option>
           <option value="completed">Completed</option>
           <option value="uncompleted">Uncompleted</option>
         </select>
       </div>
 
-      <TodoList todos={todoList} setTodos={setTodoList} filteredTodos={filteredTodos} />
+      <TodoList filterTodo={filterTodo} />
       
-      <Pending todo={todoList} count={count} setTodo={setTodoList} />
+      <Pending count={count} />
 
     </div>
   );

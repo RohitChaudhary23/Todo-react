@@ -1,27 +1,20 @@
-import React from 'react'
+import React from 'react';
+import { todoDeleted, todoCompleted } from '../redux/actionCreator';
+import { useDispatch } from 'react-redux';
 
-function Todo({ todo, todos, setTodos }) {
+function Todo({ todo }) {
+
+    const dispatch = useDispatch();
 
     const doneTodo = () => {
-        setTodos(
-            todos.map((item) => {
-                if(item.id === todo.id){
-                    return {
-                        ...item, isCompleted: !item.isCompleted
-                    }
-                }
-                return item;
-            })
-        )
+        dispatch(todoCompleted(todo.id));
     }
 
     const deleteTodo = (e) => {
         const element = e.target.parentElement;
         element.classList.add('removeTodo');
         element.addEventListener('transitionend', function() {
-            setTodos(
-                todos.filter((item) => item.id !== todo.id)
-            )
+            dispatch(todoDeleted(todo.id));
         })
     }
 

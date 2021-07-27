@@ -1,9 +1,13 @@
 import React from 'react';
+import { clearedTodo } from '../redux/actionCreator'
+import { useDispatch } from 'react-redux';
 
-function Pending({ todo, count, setTodo }) {
+function Pending({ count }) {
+    
+    const dispatch = useDispatch();
 
     const clearTodo = () => {
-        setTodo([]);
+        dispatch(clearedTodo());
     }
 
     if(count > 0) {

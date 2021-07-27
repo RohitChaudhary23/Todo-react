@@ -1,7 +1,11 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { todoAdded } from '../redux/actionCreator';
 import '../App.css';
 
-function Input({ input, setInput, todo, setTodo }) {
+function Input({ input, setInput }) {
+
+    const dispatch = useDispatch();
 
     const updateInput = (e) => {
         setInput(e.target.value);
@@ -9,17 +13,8 @@ function Input({ input, setInput, todo, setTodo }) {
 
     const submitTodo = (e) => {
         e.preventDefault();
+        dispatch(todoAdded(input));
 
-        setTodo([
-            ...todo,
-            {
-                id: Math.random(),
-                text: input,
-                isCompleted: false
-            }
-        ]);
-
-        //reset input field
         setInput('');
     }
 
